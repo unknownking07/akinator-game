@@ -20,10 +20,21 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
   const [askedQuestions, setAskedQuestions] = useState<Set<string>>(new Set())
 
   useEffect(() => {
-    // Initialize game
-    setPossiblePeople([...gameData.people])
-    askNextQuestion([...gameData.people], new Set())
+    // Initialize game with shuffled people for variety
+    const shuffledPeople = shuffleArray([...gameData.people])
+    setPossiblePeople(shuffledPeople)
+    askNextQuestion(shuffledPeople, new Set())
   }, [gameData])
+
+  // Utility function to shuffle array
+  const shuffleArray = <T>(array: T[]): T[] => {
+    const shuffled = [...array]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    return shuffled
+  }
 
   const askNextQuestion = (people: Person[], asked: Set<string>) => {
     if (people.length <= 1) {
@@ -37,20 +48,23 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
     }
 
     if (questionCount >= 20) {
-      // Make a guess with the most likely person
-      const guess = people[0]
+      // Make a guess with the most likely person (shuffle for variety)
+      const shuffledPeople = shuffleArray(people)
+      const guess = shuffledPeople[0]
       setFinalGuess(guess)
       setGamePhase('guessing')
       return
     }
 
-    // Find the best question that hasn't been asked
+    // Get available questions and shuffle them for randomness
+    const availableQuestions = gameData.questions.filter(q => !asked.has(q.id))
+    const shuffledQuestions = shuffleArray(availableQuestions)
+
+    // Find the best question from the shuffled list
     let bestQuestion: Question | null = null
     let bestScore = -1
 
-    for (const question of gameData.questions) {
-      if (asked.has(question.id)) continue
-
+    for (const question of shuffledQuestions) {
       // Calculate how well this question splits the remaining people
       const yesCount = people.filter(person => 
         person.attributes[question.attribute] === question.expectedValue
@@ -58,18 +72,23 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
       
       const score = Math.abs(yesCount - (people.length - yesCount))
       
-      if (bestQuestion === null || score < bestScore) {
+      // Add some randomness to question selection for variety
+      const randomBonus = Math.random() * 0.3 // Small random factor
+      const finalScore = score + randomBonus
+      
+      if (bestQuestion === null || finalScore < bestScore) {
         bestQuestion = question
-        bestScore = score
+        bestScore = finalScore
       }
     }
 
     if (bestQuestion) {
       setCurrentQuestion(bestQuestion)
     } else {
-      // No more questions, make a guess
+      // No more questions, make a guess from shuffled people
       if (people.length > 0) {
-        setFinalGuess(people[0])
+        const shuffledPeople = shuffleArray(people)
+        setFinalGuess(shuffledPeople[0])
         setGamePhase('guessing')
       } else {
         setGamePhase('lost')
@@ -115,12 +134,14 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
 
   const resetGame = () => {
     setCurrentQuestion(null)
-    setPossiblePeople([...gameData.people])
+    // Shuffle people at the start of each game for variety
+    const shuffledPeople = shuffleArray([...gameData.people])
+    setPossiblePeople(shuffledPeople)
     setQuestionCount(0)
     setGamePhase('playing')
     setFinalGuess(null)
     setAskedQuestions(new Set())
-    askNextQuestion([...gameData.people], new Set())
+    askNextQuestion(shuffledPeople, new Set())
   }
 
   return (
@@ -155,13 +176,13 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
               </h3>
               
               <div className="space-y-3">
-                {[
+                {shuffleArray([
                   { value: 'yes', label: '✅ Yes', color: 'from-green-600 to-green-500' },
                   { value: 'probably', label: '🤔 Probably', color: 'from-blue-600 to-blue-500' },
                   { value: 'dont_know', label: '🤷‍♂️ Don\'t know', color: 'from-gray-600 to-gray-500' },
                   { value: 'probably_not', label: '🙄 Probably not', color: 'from-orange-600 to-orange-500' },
                   { value: 'no', label: '❌ No', color: 'from-red-600 to-red-500' },
-                ].map(({ value, label, color }) => (
+                ]).map(({ value, label, color }) => (
                   <motion.button
                     key={value}
                     whileHover={{ scale: 1.02 }}

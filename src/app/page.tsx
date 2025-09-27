@@ -116,8 +116,11 @@ export default function Home() {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setGameStarted(true)}
                 className="answer-button w-full"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
               >
-                🚀 Start the Magic!
+                🎲 Start the Magic! 🔮
               </motion.button>
             </div>
           </motion.div>
