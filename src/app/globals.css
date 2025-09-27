@@ -4,10 +4,10 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply box-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-gradient-to-br from-violet-900 via-violet-800 to-purple-900 min-h-screen;
   }
 }
 
