@@ -56,29 +56,39 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
       return
     }
 
-    // Get available questions and shuffle them for randomness
+    // Get available questions and shuffle them completely for randomness
     const availableQuestions = gameData.questions.filter(q => !asked.has(q.id))
     const shuffledQuestions = shuffleArray(availableQuestions)
 
-    // Find the best question from the shuffled list
-    let bestQuestion: Question | null = null
-    let bestScore = -1
+    // Sometimes pick a completely random question (30% chance)
+    // Otherwise use smart algorithm for efficient guessing
+    const useRandomQuestion = Math.random() < 0.3
 
-    for (const question of shuffledQuestions) {
-      // Calculate how well this question splits the remaining people
-      const yesCount = people.filter(person => 
-        person.attributes[question.attribute] === question.expectedValue
-      ).length
-      
-      const score = Math.abs(yesCount - (people.length - yesCount))
-      
-      // Add some randomness to question selection for variety
-      const randomBonus = Math.random() * 0.3 // Small random factor
-      const finalScore = score + randomBonus
-      
-      if (bestQuestion === null || finalScore < bestScore) {
-        bestQuestion = question
-        bestScore = finalScore
+    let bestQuestion: Question | null = null
+
+    if (useRandomQuestion && shuffledQuestions.length > 0) {
+      // Pick a random question for unpredictability
+      bestQuestion = shuffledQuestions[Math.floor(Math.random() * shuffledQuestions.length)]
+    } else {
+      // Use smart algorithm but with shuffled order for variety
+      let bestScore = Infinity
+
+      for (const question of shuffledQuestions) {
+        // Calculate how well this question splits the remaining people
+        const yesCount = people.filter(person => 
+          person.attributes[question.attribute] === question.expectedValue
+        ).length
+        
+        const score = Math.abs(yesCount - (people.length - yesCount))
+        
+        // Add randomness factor to prevent always picking the same "optimal" question
+        const randomFactor = Math.random() * 2 // Bigger random element
+        const finalScore = score + randomFactor
+        
+        if (finalScore < bestScore) {
+          bestQuestion = question
+          bestScore = finalScore
+        }
       }
     }
 
@@ -176,13 +186,13 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
               </h3>
               
               <div className="space-y-3">
-                {shuffleArray([
+                {[
                   { value: 'yes', label: '✅ Yes', color: 'from-green-600 to-green-500' },
                   { value: 'probably', label: '🤔 Probably', color: 'from-blue-600 to-blue-500' },
                   { value: 'dont_know', label: '🤷‍♂️ Don\'t know', color: 'from-gray-600 to-gray-500' },
                   { value: 'probably_not', label: '🙄 Probably not', color: 'from-orange-600 to-orange-500' },
                   { value: 'no', label: '❌ No', color: 'from-red-600 to-red-500' },
-                ]).map(({ value, label, color }) => (
+                ].map(({ value, label, color }) => (
                   <motion.button
                     key={value}
                     whileHover={{ scale: 1.02 }}

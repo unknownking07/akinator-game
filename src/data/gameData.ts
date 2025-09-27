@@ -17,7 +17,13 @@ export const gameData: GameData = {
         isMale: true,
         bornIn1970s: true,
         isSouthAfrican: true,
-        ownsSocialMedia: true
+        ownsSocialMedia: true,
+        isEuropean: false,
+        speaksEnglish: true,
+        isEntrepreneur: true,
+        appearsInMovies: false,
+        isUnder30: false,
+        isOver50: false
       }
     },
     {
@@ -35,7 +41,13 @@ export const gameData: GameData = {
         bornIn1960s: true,
         isSouthAfrican: false,
         ownsSocialMedia: false,
-        foundedAmazon: true
+        foundedAmazon: true,
+        isEuropean: false,
+        speaksEnglish: true,
+        isEntrepreneur: true,
+        appearsInMovies: false,
+        isUnder30: false,
+        isOver50: true
       }
     },
     {
@@ -53,7 +65,13 @@ export const gameData: GameData = {
         bornIn1950s: true,
         isSouthAfrican: false,
         ownsSocialMedia: false,
-        foundedMicrosoft: true
+        foundedMicrosoft: true,
+        isEuropean: false,
+        speaksEnglish: true,
+        isEntrepreneur: true,
+        appearsInMovies: false,
+        isUnder30: false,
+        isOver50: true
       }
     },
 
@@ -74,7 +92,13 @@ export const gameData: GameData = {
         isSouthAfrican: false,
         ownsSocialMedia: false,
         foundedCoinbase: true,
-        isCryptoFounder: true
+        isCryptoFounder: true,
+        isEuropean: false,
+        speaksEnglish: true,
+        isEntrepreneur: true,
+        appearsInMovies: false,
+        isUnder30: false,
+        isOver50: false
       }
     },
     {
@@ -94,7 +118,13 @@ export const gameData: GameData = {
         ownsSocialMedia: false,
         foundedCoinbase: false,
         isCryptoFounder: true,
-        createdBase: true
+        createdBase: true,
+        isEuropean: false,
+        speaksEnglish: true,
+        isEntrepreneur: true,
+        appearsInMovies: false,
+        isUnder30: false,
+        isOver50: false
       }
     },
 
@@ -115,7 +145,13 @@ export const gameData: GameData = {
         isSouthAfrican: false,
         ownsSocialMedia: false,
         isYouTuber: true,
-        hasMillionsOfSubs: true
+        hasMillionsOfSubs: true,
+        isEuropean: false,
+        speaksEnglish: true,
+        isEntrepreneur: true,
+        appearsInMovies: true,
+        isUnder30: true,
+        isOver50: false
       }
     },
     {
@@ -135,7 +171,13 @@ export const gameData: GameData = {
         ownsSocialMedia: false,
         isYouTuber: true,
         hasMillionsOfSubs: true,
-        isSwedish: true
+        isSwedish: true,
+        isEuropean: true,
+        speaksEnglish: true,
+        isEntrepreneur: true,
+        appearsInMovies: false,
+        isUnder30: false,
+        isOver50: false
       }
     },
 
@@ -157,7 +199,13 @@ export const gameData: GameData = {
         ownsSocialMedia: false,
         isFootballer: true,
         wonWorldCup: true,
-        isArgentinian: true
+        isArgentinian: true,
+        isEuropean: false,
+        speaksEnglish: false,
+        isEntrepreneur: false,
+        appearsInMovies: true,
+        isUnder30: false,
+        isOver50: false
       }
     },
     {
@@ -177,7 +225,13 @@ export const gameData: GameData = {
         ownsSocialMedia: false,
         isFootballer: true,
         wonWorldCup: false,
-        isPortuguese: true
+        isPortuguese: true,
+        isEuropean: true,
+        speaksEnglish: false,
+        isEntrepreneur: true,
+        appearsInMovies: true,
+        isUnder30: false,
+        isOver50: false
       }
     },
 
@@ -200,7 +254,13 @@ export const gameData: GameData = {
         isAnimeCharacter: true,
         isFictional: true,
         hasSuperpowers: true,
-        isFromDragonBall: true
+        isFromDragonBall: true,
+        isEuropean: false,
+        speaksEnglish: false,
+        isEntrepreneur: false,
+        appearsInMovies: true,
+        isUnder30: false,
+        isOver50: false
       }
     },
     {
@@ -221,7 +281,13 @@ export const gameData: GameData = {
         isAnimeCharacter: true,
         isFictional: true,
         hasSuperpowers: true,
-        isNinja: true
+        isNinja: true,
+        isEuropean: false,
+        speaksEnglish: false,
+        isEntrepreneur: false,
+        appearsInMovies: true,
+        isUnder30: true,
+        isOver50: false
       }
     }
   ],
@@ -345,6 +411,48 @@ export const gameData: GameData = {
       id: 'is_south_african',
       text: 'Is this person from South Africa?',
       attribute: 'isSouthAfrican',
+      expectedValue: true
+    },
+    {
+      id: 'is_european',
+      text: 'Is this person from Europe?',
+      attribute: 'isEuropean',
+      expectedValue: true
+    },
+    {
+      id: 'speaks_english',
+      text: 'Does this person primarily speak English?',
+      attribute: 'speaksEnglish',
+      expectedValue: true
+    },
+    {
+      id: 'has_social_media',
+      text: 'Is this person very active on social media?',
+      attribute: 'isOnTwitter',
+      expectedValue: true
+    },
+    {
+      id: 'is_entrepreneur',
+      text: 'Is this person known as an entrepreneur?',
+      attribute: 'isEntrepreneur',
+      expectedValue: true
+    },
+    {
+      id: 'appears_in_movies',
+      text: 'Has this person appeared in movies or TV shows?',
+      attribute: 'appearsInMovies',
+      expectedValue: true
+    },
+    {
+      id: 'is_under_30',
+      text: 'Is this person under 30 years old?',
+      attribute: 'isUnder30',
+      expectedValue: true
+    },
+    {
+      id: 'is_over_50',
+      text: 'Is this person over 50 years old?',
+      attribute: 'isOver50',
       expectedValue: true
     }
   ]
