@@ -114,7 +114,7 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
   const handleAnswer = (answer: 'yes' | 'no' | 'probably' | 'probably_not' | 'dont_know') => {
     if (!currentQuestion) return
 
-    const newAsked = new Set([...askedQuestions, currentQuestion.id])
+    const newAsked = new Set(Array.from(askedQuestions).concat([currentQuestion.id]))
     setAskedQuestions(newAsked)
     setQuestionCount(prev => prev + 1)
 
