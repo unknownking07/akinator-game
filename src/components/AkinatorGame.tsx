@@ -19,16 +19,6 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
   const [finalGuess, setFinalGuess] = useState<Person | null>(null)
   const [askedQuestions, setAskedQuestions] = useState<Set<string>>(new Set())
 
-  useEffect(() => {
-    // Initialize game with shuffled people and full confidence
-    const shuffledPeople = shuffleArray([...gameData.people]).map(person => ({
-      ...person,
-      confidence: 1.0 // Start with 100% confidence for all
-    }))
-    setPossiblePeople(shuffledPeople)
-    askNextQuestion(shuffledPeople, new Set())
-  }, [gameData])
-
   // Utility function to shuffle array
   function shuffleArray<T>(array: T[]): T[] {
     const shuffled = [...array]
@@ -110,6 +100,16 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
       }
     }
   }
+
+  useEffect(() => {
+    // Initialize game with shuffled people and full confidence
+    const shuffledPeople = shuffleArray([...gameData.people]).map(person => ({
+      ...person,
+      confidence: 1.0 // Start with 100% confidence for all
+    }))
+    setPossiblePeople(shuffledPeople)
+    askNextQuestion(shuffledPeople, new Set())
+  }, [gameData])
 
   const handleAnswer = (answer: 'yes' | 'no' | 'probably' | 'probably_not' | 'dont_know') => {
     if (!currentQuestion) return
@@ -235,7 +235,7 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
               className="mt-6 text-center"
             >
               <h3 className="text-xl font-bold text-white mb-4">
-                I think you're thinking of...
+                I think you&apos;re thinking of...
               </h3>
               
               <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl p-4 mb-4">
@@ -253,7 +253,7 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
                   onClick={() => handleFinalAnswer(true)}
                   className="w-full bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-3 px-4 rounded-xl"
                 >
-                  🎉 Yes, that's correct!
+                  🎉 Yes, that&apos;s correct!
                 </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -305,7 +305,7 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
                 You Got Me!
               </h3>
               <p className="text-violet-200 mb-4">
-                The genie's magic failed this time. 
+                The genie&apos;s magic failed this time. 
                 <br />Care to try again?
               </p>
               <motion.button
