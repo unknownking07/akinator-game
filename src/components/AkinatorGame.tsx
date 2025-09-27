@@ -30,7 +30,7 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
   }, [gameData])
 
   // Utility function to shuffle array
-  const shuffleArray = <T>(array: T[]): T[] => {
+  function shuffleArray<T>(array: T[]): T[] {
     const shuffled = [...array]
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -209,7 +209,7 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
                 {[
                   { value: 'yes', label: '✅ Yes', color: 'from-green-600 to-green-500' },
                   { value: 'probably', label: '🤔 Probably', color: 'from-blue-600 to-blue-500' },
-                  { value: 'dont_know', label: '🤷‍♂️ Don\'t know', color: 'from-gray-600 to-gray-500' },
+                  { value: 'dont_know', label: '🤷‍♂️ Don&apos;t know', color: 'from-gray-600 to-gray-500' },
                   { value: 'probably_not', label: '🙄 Probably not', color: 'from-orange-600 to-orange-500' },
                   { value: 'no', label: '❌ No', color: 'from-red-600 to-red-500' },
                 ].map(({ value, label, color }) => (

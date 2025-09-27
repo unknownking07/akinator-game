@@ -72,7 +72,7 @@ export default function Home() {
             <h2 className="text-6xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
               Akinator Genie
             </h2>
-            <p className="text-violet-200 mt-4 text-lg">Think of someone famous, and I'll guess who it is!</p>
+            <p className="text-violet-200 mt-4 text-lg">Think of someone famous, and I&apos;ll guess who it is!</p>
           </motion.div>
         ) : !gameStarted ? (
           <motion.div
