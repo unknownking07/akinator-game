@@ -20,8 +20,11 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
   const [askedQuestions, setAskedQuestions] = useState<Set<string>>(new Set())
 
   useEffect(() => {
-    // Initialize game with shuffled people for variety
-    const shuffledPeople = shuffleArray([...gameData.people])
+    // Initialize game with shuffled people and full confidence
+    const shuffledPeople = shuffleArray([...gameData.people]).map(person => ({
+      ...person,
+      confidence: 1.0 // Start with 100% confidence for all
+    }))
     setPossiblePeople(shuffledPeople)
     askNextQuestion(shuffledPeople, new Set())
   }, [gameData])
@@ -37,21 +40,20 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
   }
 
   const askNextQuestion = (people: Person[], asked: Set<string>) => {
-    if (people.length <= 1) {
-      if (people.length === 1) {
-        setFinalGuess(people[0])
-        setGamePhase('guessing')
-      } else {
-        setGamePhase('lost')
-      }
+    if (people.length === 0) {
+      setGamePhase('lost')
       return
     }
 
-    if (questionCount >= 20) {
-      // Make a guess with the most likely person (shuffle for variety)
-      const shuffledPeople = shuffleArray(people)
-      const guess = shuffledPeople[0]
-      setFinalGuess(guess)
+    // Check if we have a clear winner (high confidence)
+    const topCandidate = people[0]
+    const hasHighConfidence = (topCandidate.confidence || 1.0) > 0.8
+    const significantGap = people.length > 1 ? 
+      (topCandidate.confidence || 1.0) - (people[1].confidence || 1.0) > 0.3 : true
+
+    // Only guess if we have high confidence AND significant gap from others
+    if (people.length === 1 || (hasHighConfidence && significantGap) || questionCount >= 15) {
+      setFinalGuess(topCandidate)
       setGamePhase('guessing')
       return
     }
@@ -60,36 +62,39 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
     const availableQuestions = gameData.questions.filter(q => !asked.has(q.id))
     const shuffledQuestions = shuffleArray(availableQuestions)
 
-    // Sometimes pick a completely random question (30% chance)
-    // Otherwise use smart algorithm for efficient guessing
-    const useRandomQuestion = Math.random() < 0.3
-
+    // Use a balanced approach: find questions that best split the remaining people
     let bestQuestion: Question | null = null
+    let bestScore = Infinity
 
-    if (useRandomQuestion && shuffledQuestions.length > 0) {
-      // Pick a random question for unpredictability
-      bestQuestion = shuffledQuestions[Math.floor(Math.random() * shuffledQuestions.length)]
-    } else {
-      // Use smart algorithm but with shuffled order for variety
-      let bestScore = Infinity
-
-      for (const question of shuffledQuestions) {
-        // Calculate how well this question splits the remaining people
-        const yesCount = people.filter(person => 
-          person.attributes[question.attribute] === question.expectedValue
-        ).length
-        
-        const score = Math.abs(yesCount - (people.length - yesCount))
-        
-        // Add randomness factor to prevent always picking the same "optimal" question
-        const randomFactor = Math.random() * 2 // Bigger random element
-        const finalScore = score + randomFactor
-        
-        if (finalScore < bestScore) {
-          bestQuestion = question
-          bestScore = finalScore
-        }
+    for (const question of shuffledQuestions) {
+      // Calculate how well this question splits the remaining people
+      const yesCount = people.filter(person => 
+        person.attributes[question.attribute] === question.expectedValue
+      ).length
+      
+      const noCount = people.length - yesCount
+      
+      // Prefer questions that split people more evenly (better information gain)
+      const balance = Math.abs(yesCount - noCount) / people.length
+      
+      // Avoid questions that eliminate everyone or keep everyone
+      if (yesCount === 0 || noCount === 0) {
+        continue // Skip questions that don't help narrow down
       }
+      
+      // Add small random factor for variety while keeping it smart
+      const randomFactor = Math.random() * 0.1
+      const finalScore = balance + randomFactor
+      
+      if (finalScore < bestScore) {
+        bestQuestion = question
+        bestScore = finalScore
+      }
+    }
+
+    // Fallback: if no good splitting question found, pick any available question
+    if (!bestQuestion && shuffledQuestions.length > 0) {
+      bestQuestion = shuffledQuestions[0]
     }
 
     if (bestQuestion) {
@@ -113,22 +118,34 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
     setAskedQuestions(newAsked)
     setQuestionCount(prev => prev + 1)
 
-    let filteredPeople = [...possiblePeople]
+    // Calculate confidence scores for each person based on their attributes
+    const scoredPeople = possiblePeople.map(person => {
+      const hasAttribute = person.attributes[currentQuestion.attribute] === currentQuestion.expectedValue
+      let confidence = 0
 
-    if (answer === 'yes' || answer === 'probably') {
-      const weight = answer === 'yes' ? 1.0 : 0.7
-      filteredPeople = filteredPeople.filter(person => {
-        const hasAttribute = person.attributes[currentQuestion.attribute] === currentQuestion.expectedValue
-        return Math.random() < (hasAttribute ? weight : (1 - weight))
-      })
-    } else if (answer === 'no' || answer === 'probably_not') {
-      const weight = answer === 'no' ? 1.0 : 0.7
-      filteredPeople = filteredPeople.filter(person => {
-        const hasAttribute = person.attributes[currentQuestion.attribute] === currentQuestion.expectedValue
-        return Math.random() < (hasAttribute ? (1 - weight) : weight)
-      })
-    }
-    // For "don't know", we keep all people but with reduced confidence
+      if (answer === 'yes') {
+        confidence = hasAttribute ? 1.0 : 0.0 // Strong match or complete mismatch
+      } else if (answer === 'probably') {
+        confidence = hasAttribute ? 0.8 : 0.2 // Good match or unlikely
+      } else if (answer === 'no') {
+        confidence = hasAttribute ? 0.0 : 1.0 // Complete mismatch or strong match
+      } else if (answer === 'probably_not') {
+        confidence = hasAttribute ? 0.2 : 0.8 // Unlikely or good match
+      } else if (answer === 'dont_know') {
+        confidence = 0.5 // Neutral - keep everyone with reduced confidence
+      }
+
+      return {
+        ...person,
+        confidence: (person.confidence || 1.0) * confidence
+      }
+    })
+
+    // Filter out people with very low confidence (less than 10%)
+    const filteredPeople = scoredPeople.filter(person => person.confidence > 0.1)
+
+    // Sort by confidence to prioritize most likely matches
+    filteredPeople.sort((a, b) => (b.confidence || 0) - (a.confidence || 0))
 
     setPossiblePeople(filteredPeople)
     askNextQuestion(filteredPeople, newAsked)
@@ -144,8 +161,11 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
 
   const resetGame = () => {
     setCurrentQuestion(null)
-    // Shuffle people at the start of each game for variety
-    const shuffledPeople = shuffleArray([...gameData.people])
+    // Shuffle people and reset confidence scores for each new game
+    const shuffledPeople = shuffleArray([...gameData.people]).map(person => ({
+      ...person,
+      confidence: 1.0 // Reset confidence to 100% for all
+    }))
     setPossiblePeople(shuffledPeople)
     setQuestionCount(0)
     setGamePhase('playing')
@@ -305,6 +325,13 @@ export default function AkinatorGame({ onRestart, gameData }: AkinatorGameProps)
             <span className="text-violet-300 text-sm">
               🎯 {possiblePeople.length} possibilities remaining
             </span>
+            {possiblePeople[0]?.confidence && (
+              <div className="mt-2">
+                <span className="text-yellow-300 text-xs">
+                  🔮 Confidence: {Math.round((possiblePeople[0].confidence || 0) * 100)}%
+                </span>
+              </div>
+            )}
           </div>
         )}
       </div>

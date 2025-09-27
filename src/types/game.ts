@@ -4,6 +4,7 @@ export interface Person {
   category: string
   emoji: string
   attributes: Record<string, any>
+  confidence?: number
 }
 
 export interface Question {
