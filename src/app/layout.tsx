@@ -16,6 +16,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script src="https://miniapps.farcaster.xyz/sdk.js"></script>
+      </head>
       <body className={`${inter.className} bg-gradient-to-br from-violet-900 via-violet-800 to-purple-900 min-h-screen`}>
         {children}
       </body>

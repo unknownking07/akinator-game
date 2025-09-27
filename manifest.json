@@ -2,9 +2,10 @@
   "name": "Akinator Genie",
   "version": "1.0.0",
   "description": "Guess famous personalities with the mystical genie!",
-  "homeUrl": "https://your-app-url.vercel.app",
-  "imageUrl": "https://your-app-url.vercel.app/genie-icon.png",
-  "buttonTitle": "Play Akinator",
-  "splashImageUrl": "https://your-app-url.vercel.app/splash.png",
-  "splashBackgroundColor": "#8b5cf6"
+  "homeUrl": "https://akinator-farcaster-mini-app.vercel.app",
+  "imageUrl": "https://akinator-farcaster-mini-app.vercel.app/genie-icon.png",
+  "buttonTitle": "🧞‍♂️ Play Akinator",
+  "splashImageUrl": "https://akinator-farcaster-mini-app.vercel.app/splash.png",
+  "splashBackgroundColor": "#8b5cf6",
+  "backgroundColor": "#4c1d95"
 }

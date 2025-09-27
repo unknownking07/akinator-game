@@ -5,20 +5,26 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Star, Crown, Trophy } from 'lucide-react'
 import AkinatorGame from '@/components/AkinatorGame'
 import GenieCharacter from '@/components/GenieCharacter'
+import FarcasterReady from '@/components/FarcasterReady'
 import { gameData } from '@/data/gameData'
 
 export default function Home() {
   const [gameStarted, setGameStarted] = useState(false)
   const [showWelcome, setShowWelcome] = useState(true)
+  const [farcasterReady, setFarcasterReady] = useState(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowWelcome(false)
-    }, 3000)
-    return () => clearTimeout(timer)
-  }, [])
+    // Only start welcome timer when Farcaster is ready
+    if (farcasterReady) {
+      const timer = setTimeout(() => {
+        setShowWelcome(false)
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [farcasterReady])
 
   return (
+    <FarcasterReady onReady={() => setFarcasterReady(true)}>
     <main className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
@@ -140,5 +146,6 @@ export default function Home() {
         )}
       </AnimatePresence>
     </main>
+    </FarcasterReady>
   )
 }
